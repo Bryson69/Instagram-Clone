@@ -57,7 +57,7 @@ Available for Windows, macOS, and Linux.
 
 > For linux users. You can directly install it from SnapStore.
 
-[![Get it from the Snap Store](https://play.google.com/store/apps/details?id=com.evozi.injector&hl=en)](https://github.com/Bryson69/Instagram-Clone)
+[![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://github.com/Bryson69/Instagram-Clone)
 
 ### License
 **[MIT](./LICENSE)** (c) 2020 **[Bryson Mundia]()**
