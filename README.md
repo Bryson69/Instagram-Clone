@@ -1,5 +1,4 @@
 # INSTAGRAM CLONE
-## 
 
 ## By BrysonMundia (https://github.com/Bryson69)😎 
 
@@ -33,8 +32,8 @@ A web application whereby you can view instagram posts.
 * $ python3 run.py
 
 # How it works
-* A User needs to sign up
-* A User the needs to sign in to the instagram account and post
+> User needs to sign up
+> A User the needs to sign in to the instagram account and post
 
 # CREDITS
 ##### Google.com ⭐️ StackOverflow.com ⭐️ & :star:.
@@ -52,7 +51,7 @@ Change the user login does not function properly.
 - PostgreSQL
 
 ## :computer: Installation
-
+Get the real application on snapstore.
 Available for Windows, macOS, and Linux.
 
 > For linux users. You can directly install it from SnapStore.
