@@ -11,11 +11,7 @@ class Post(models.Model):
     author = models.ForeignKey('auth.User',on_delete=models.CASCADE)
     image = models.ImageField(blank=True, null=True)
     caption = models.TextField()
-    likes = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, related_name='post_likes')
     created_date = models.DateTimeField(default=timezone.now)
-
-    def get_absolute_url(self):
-        return reverse('insta:post_detail', kwargs={"id":self.id})
 
     def __str__(self):    
         return self.caption 
