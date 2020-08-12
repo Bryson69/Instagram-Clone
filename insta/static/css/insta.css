@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css?family=Cute+Font|Almendra");
+
 body{
     background-color: #ffff;
 }
@@ -118,6 +120,7 @@ header{
 }
 
 .post_name{
+    font-family: Almendra;
     font-size: 14px;
     color: #111;
     font-weight: 600;
@@ -126,6 +129,7 @@ header{
 }
 
 .post_location{
+    font-family: Almendra;
     font-size: 12px;
     color: gray;
     padding: 0;
