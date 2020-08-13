@@ -32,7 +32,7 @@ A web application whereby you can view instagram posts.
 * $ python3 run.py
 
 # How it works
-> User needs to sign up
+> User needs to sign up.
 > A User the needs to sign in to the instagram account and post
 
 # CREDITS
