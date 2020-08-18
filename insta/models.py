@@ -1,40 +1,91 @@
-from django.db import models
 from django.contrib.auth.models import User
-from django.utils import timezone
-from datetime import datetime
-from django.conf import settings
-from django.urls import reverse
-from PIL import Image
+from django.db import models
+from pyuploadcare.dj.models import ImageField
+from friendship.models import Friend,Follow,Block
 
 # Create your models here.
-class Post(models.Model):
-    author = models.ForeignKey('auth.User',on_delete=models.CASCADE)
-    image = models.ImageField(blank=True, null=True)
-    caption = models.TextField()
-    created_date = models.DateTimeField(default=timezone.now)
 
-    def __str__(self):    
-        return self.caption 
+
 
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    profile_photo = models.ImageField(default='default_avatar.jpg', upload_to='profile_pics')
-    name = models.CharField(max_length=50)
-    bio = models.TextField(max_length=250)
-    follows = models.ManyToManyField('Profile', related_name='followed_by')
+    profile_pic =ImageField( blank=True)
+    bio = models.CharField(max_length=255)
+    owner = models.OneToOneField(User,blank=True, on_delete=models.CASCADE, related_name="profile")
 
     def __str__(self):
-        return f'{self.user.username} Profile'
+        return str(self.bio)
 
-    def save(self):
-        super().save()
 
-        img = Image.open(self.profile_photo.path)
+    def profile_save(self):
+        self.save()
 
-        if img.height > 300 or img.width > 300:
-            output_size = (300, 300)
-            img.thumbnail(output_size)
-            img.save(self.profile_photo.path)
+    def delete_profile(self):
+        self.delete()
+
+    @classmethod
+    def get_by_id(cls, id):
+        profile = Profile.objects.get(owner=id)
+        return profile
+
+    @classmethod
+    def get_profile_by_username(cls, owner):
+        profiles = cls.objects.filter(owner__contains=owner)
+        return profiles
+
+
+
+
+
+class Image(models.Model):
+    pic=ImageField(manual_crop='1080x800', blank=True)
+    name= models.CharField(max_length=55)
+    caption = models.TextField(blank=True)
+    profile= models.ForeignKey(User, blank=True,on_delete=models.CASCADE)
+
+
+
+    def __str__(self):
+        return str(self.name)
+
+    def save_image(self):
+        self.save()
+
+    def delete_image(self):
+        self.delete()
+
+    @classmethod
+    def get_profile_images(cls, profile):
+        images = Image.objects.filter(profile__pk=profile)
+        return images
+
+class Comment(models.Model):
+    image = models.ForeignKey(Image,blank=True, on_delete=models.CASCADE,related_name='comment')
+    comment_owner = models.ForeignKey(User, blank=True)
+    comment= models.TextField()
+
+    def save_comment(self):
+        self.save()
+
+    def delete_comment(self):
+        self.delete()
+
+    @classmethod
+    def get_image_comments(cls, id):
+        comments = Comment.objects.filter(image__pk=id)
+        return comments
+
+    def __str__(self):
+        return str(self.comment)
+
+
+
+class Likes(models.Model):
+    liker=models.ForeignKey(User)
+    image =models.ForeignKey(Image)
+
+
+
+
 
 
 

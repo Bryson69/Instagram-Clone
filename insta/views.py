@@ -1,72 +1,123 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.utils import timezone
-from django.urls import reverse
-from .forms import PostForm
-from .models import Post
-from django.views.generic import (
-    ListView,
-    CreateView,
-    DetailView,
-)
-from datetime import datetime
-from django.contrib import messages
+from django.http import Http404
+from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User 
-from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm
+from django.contrib.auth.models import User
+from friendship.exceptions import AlreadyExistsError
+
+from .models import Image, Profile,Comment,Follow,Likes
+from .forms import ProfileForm,ImageForm,CommentForm
+
 
 # Create your views here.
-class PostListView(ListView):
-    template_name = "insta/post_list.html"
-    queryset = Post.objects.all().filter(created_date__lte=timezone.now()).order_by('-created_date')
-    context_object_name = 'posts'
 
-class PostCreateView(CreateView):
-    template_name = 'insta/post_create.html'
-    form_class = PostForm
-    queryset = Post.objects.all()
-    success_url = '/'
-
-    def form_valid(self, form):
-        print(form.cleaned_data)
-        form.instance.author = self.request.user
-        return super().form_valid(form)
+@login_required(login_url='/accounts/login/')
+def home(request):
+    current_user = request.user
+    all_images = Image.objects.all()
+    comments = Comment.objects.all()
+    likes = Likes.objects.all
+    profile = Profile.objects.all()
+    print(likes)
+    return render(request,'home.html',locals())
 
 
-def register(request):
+@login_required(login_url='accounts/login/')
+def add_image(request):
+    current_user = request.user
     if request.method == 'POST':
-        print("This shit is working bro.")
-        form = UserRegisterForm(request.POST)
+        form = ImageForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
-            username = form.cleaned_data.get('username')
-            print(username,"This shit is working")
-            messages.success(request, f'Account created for {username} successfully!')
-            return redirect('/')
+            add=form.save(commit=False)
+            add.profile = current_user
+            add.save()
+            return redirect('home')
     else:
-        form = UserRegisterForm()
-    return render(request, 'users/register.html', {'form': form})
+        form = ImageForm()
 
-@login_required
+
+    return render(request,'image.html',locals())
+
+
+@login_required(login_url='/login')
 def profile(request):
-    return render(request, 'users/profile.html')
+    current_user = request.user
+    # profile_details = Profile.objects.get(owner_id=current_user.id)
+    if request.method == 'POST':
+        form = ProfileForm(request.POST,request.FILES)
+        if form.is_valid():
+            profile =form.save(commit=False)
+            profile.owner = current_user
+            profile.save()
+    else:
+        form=ProfileForm()
 
-class Profile(DetailView):
-    template_name = 'users/profile.html'
-    queryset = User.objects.all()
-    success_url = '/'
+    return render(request, 'profile/new.html', locals())
 
-    def get_object(self):
-        id_ = self.kwargs.get("username")
-        user = get_object_or_404(User, username=id_)
-        return user 
-        
-    def get_context_data(self, *args, **kwargs):
-        context = super(Profile,self).get_context_data(*args, **kwargs)
-        user = self.get_object()
-        context.update({
-            'posts' : user.posts.all().filter(created_date__lte=timezone.now()).order_by('-created_date')
-        })
-        return context 
-    def add_follow(self, request):
-        user = self.get_object() 
-        user.profile.followed_by.add(request.user.profile) 
+
+@login_required(login_url='/accounts/login/')
+def display_profile(request, id):
+    seekuser=User.objects.filter(id=id).first()
+    profile = seekuser.profile
+    profile_details = Profile.get_by_id(id)
+    images = Image.get_profile_images(id)
+
+    usersss = User.objects.get(id=id)
+    follower = len(Follow.objects.followers(usersss))
+    following = len(Follow.objects.following(usersss))
+    people=User.objects.all()
+    pip_following=Follow.objects.following(request.user)
+
+    return render(request,'profile/profile.html',locals())
+
+def search(request):
+    profiles = User.objects.all()
+
+    if 'username' in request.GET and request.GET['username']:
+        search_term = request.GET.get('username')
+        results = User.objects.filter(username__icontains=search_term)
+        print(results)
+
+        return render(request,'results.html',locals())
+
+    return redirect(home)
+
+
+def comment(request,image_id):
+    current_user=request.user
+    image = Image.objects.get(id=image_id)
+    profile_owner = User.objects.get(username=current_user)
+    comments = Comment.objects.all()
+    print(comments)
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.image = image
+            comment.comment_owner = current_user
+            comment.save()
+
+            print(comments)
+
+
+        return redirect(home)
+
+    else:
+        form = CommentForm()
+
+    return render(request, 'comment.html', locals())
+
+
+def follow(request,user_id):
+    users=User.objects.get(id=user_id)
+    follow = Follow.objects.add_follower(request.user, users)
+
+    return redirect('/profile/', locals())
+
+
+def like(request, image_id):
+    current_user = request.user
+    image=Image.objects.get(id=image_id)
+    new_like,created= Likes.objects.get_or_create(liker=current_user, image=image)
+    new_like.save()
+
+    return redirect('home')
