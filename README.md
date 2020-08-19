@@ -2,6 +2,10 @@
 
 ## By BrysonMundia (https://github.com/Bryson69)😎 
 
+## Live Site 
+
+## ![Live Site](https://instaclone345.herokuapp.com/)
+
 ## Description
 
 A web application whereby you can view instagram posts.
@@ -24,7 +28,7 @@ A web application whereby you can view instagram posts.
 * Python3.6
 ## Setup/Installation Requirements
 * internet access
-* $ git clone 
+* $ git clone https://instaclone345.herokuapp.com/
 * $ cd blog-app
 * $ python3.6 -m venv virtual (install virtual environment)
 * $ source virtual/bin/activate
