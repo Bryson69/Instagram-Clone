@@ -2,9 +2,9 @@
 
 ## By BrysonMundia (https://github.com/Bryson69)😎 
 
-## Live Site 
+## Live Site [![Live site](https://instaclone345.herokuapp.com/) 
 
-## ![Live Site](https://instaclone345.herokuapp.com/)
+
 
 ## Description
 
